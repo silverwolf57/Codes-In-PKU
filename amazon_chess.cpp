@@ -7,53 +7,60 @@
 #include<stack>
 #include<queue>
 
-//给出棋盘大小，先后手等
-#define size 8
-#define choose_white 1
-#define choose_black -1
 
-int first;//确定先手
-int rounds;//确定回合数
-int dir_x[8] = { 1,1,1,-1,-1,-1,0,0 };//给出方向数组
-int dir_y[8] = { 1,-1,0,-1,1,0,1,-1 };//给出方向数组
-char board[8][8];//给出棋盘
+#define SIZE 8
+#define EMPTY 0
+#define BLACK 1
+#define WHITE -1
+#define BLOCK 2
+#define MAX_DEPTH 4 
+int current_color;
+
+// 王和皇后8个方向的增量 
+const int dx[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+const int dy[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+//给出棋盘
+int board[8][8];
 
 
+//---基础数据结构
 
-//判断棋子是否在棋盘内
-bool boundary_check(int x,int y) {
-	if (x<0 || x>size || y<0 || y>size)return false;
-	return true;
+
+//给出坐标
+struct cordinates{
+	int x，y;
+};
+
+//给出运行位置
+struct move {
+	int x0, x1, x2, y0, y1, y2;
+};
+
+
+//---基本函数
+
+
+//检查是否在棋盘内
+bool is_valid(int x,int y) {
+	return x >= 0 && x <= SIZE && y >= 0 && y <= SIZE;
 }
 
-//判断移动是否合理
-bool check_move(int x0,int y0,int x1, int y1, int x2, int y2,int round ) {
-	if (board[x0][y0] != 'b' && board[x0][y0] != 'w')return false;
-	if (board[x1][y1] != '0')return false;
-	if (board[x2][y2] != '0')return false;
-	if (!boundary_check(x1, y1) || !boundary_check(x2, y2))return false;
-	return true;
+//用于放置棋子
+void apply_move(int current_board[SIZE][SIZE],move m,int color) {
+	current_board[m.x0][m.y0] = EMPTY;
+	current_board[m.x1][m.y1] = color;
+	current_board[m.x2][m.y2] = BLOCK;
 }
 
-//移动棋子
-void move(int x0, int y0, int x1, int y1, int x2, int y2,int round) {
-	if (check_move(x0, y0, x1, y1, x2, y2, round)) {
-		board[x0][y0] = '0';
-		if (round % 2 == 0) {
-			board[x1][y1] = 'b';
-		}
-		else {
-			board[x1][y1] = 'w';
-		}
-		board[x2][y2] == '#';
-	}
+//撤销操作便于回溯
+void undo_move(int current_board[SIZE][SIZE], move m, int color) {
+	current_board[m.x0][m.y0] = color;
+	current_board[m.x1][m.y1] = EMPTY;
+	current_board[m.x2][m.y2] = EMPTY;
 }
 
-
-
-
-
-
+//
 
 
 
