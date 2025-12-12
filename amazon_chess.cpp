@@ -467,16 +467,81 @@ double evaluate(int current_board[SIZE][SIZE], int color) {
 
 //极大极小算法和alpha-beta剪枝
 double alphaBeta(int current_board[SIZE][SIZE], int depth, int player, double alpha, double beta) {
-	//到达搜索深度
+	//到达搜索深度返回
 	if (depth == 0) {
 		return evaluate(current_board, current_color);
 	   }
+	
+	//找到所有可行招法
+	std::vector<move> possible_move = find_move(current_board, player);
 
+	//结束检测 (无走法)
+	if (possible_move.empty()) {
+		if (player== current_color) {
+			// 我方无子可走,输。返回 0.0 (最坏值)
+			return 0.0;
+		}
+		else {
+			// 对手无子可走，我方赢。返回 1.0 (最好值)
+			return 1.0;
+		}
+	}
 
+	//极大化层
+	if (player==current_color) {
+		double max_value = -1e9;
+		for (int i = 0; i < possible_move.size(); ++i) {
+				apply_move(current_board, possible_move[i],current_color);
+				//递归对手
+				double value=alphaBeta(current_board, depth - 1, -player, alpha, beta);
+				undo_move(current_board, possible_move[i], current_color);
+				max_value= std::max(max_value, value);
+				alpha =std::max(alpha, max_value);
+
+				if (beta <= alpha) break; // Alpha-Beta 剪枝
+		}
+		return max_value;
+
+		}
+
+	//极小化层
+	//极大化层
+	if (player == -current_color) {
+		double min_value = 1e9;
+		for (int i = 0; i < possible_move.size(); ++i) {
+			apply_move(current_board, possible_move[i], current_color);
+			//递归对手
+			double value = alphaBeta(current_board, depth - 1, -player, alpha, beta);
+			undo_move(current_board, possible_move[i], current_color);
+			min_value = std::min(min_value, value);
+			beta = std::max(alpha, min_value);
+
+			if (beta <= alpha) break; // Alpha-Beta 剪枝
+		}
+		return min_value;
+
+	}
+	
 }
 
+
+
 int main() {
+	std::ios::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+
+	int board[SIZE][SIZE];
+	int turnID;
+
 	//初始化棋盘
+	board[0][2] = BLACK; board[2][0] = BLACK; board[5][0] = BLACK; board[7][2] = BLACK;
+	board[0][5] = WHITE; board[2][7] = WHITE; board[5][7] = WHITE; board[7][5] = WHITE;
+
+	int x0, y0, x1, y1, x2, y2;
+	std::cin >> turnID;
+	current_color = WHITE; // 默认假设自己是白方
+
+
 
 	//输入先手
 	//输入回合和初始状态
