@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include<cstring>
 #include <chrono>
+#include<cstdio>
+#include<iomanip>
 
 #define SIZE 8
 #define EMPTY 0
@@ -475,11 +477,15 @@ void initialize_board(int board[SIZE][SIZE]) {
 
 // Simple clear screen simulation for terminal-like experience
 void clear_screen() {
-	// Note: system("cls") or system("clear") might not work in all environments,
-	// using a large number of newlines as a fallback.
-	for (int i = 0; i < 50; ++i) {
-		std::cout << "\n";
-	}
+	system("cls");
+}
+
+char cell_char(int cell) {
+	if (cell == EMPTY) return ' ';
+	if (cell == BLACK) return 'B';
+	if (cell == WHITE) return 'W';
+	if (cell == BLOCK) return '#';
+	return '?';
 }
 
 // Draw the board (using ASCII)
@@ -497,39 +503,47 @@ void print_board(const int board[SIZE][SIZE], int ai_color) {
 	// Print column indices
 	std::cout << "   ";
 	for (int j = 0; j < SIZE; ++j) {
-		std::cout << " " << j;
+		std::cout << "  " << j;
 	}
 	std::cout << "\n";
 
-	// Print separator line
-	std::cout << "  +";
+	std::cout << "   ┌";
 	for (int j = 0; j < SIZE; ++j) {
-		std::cout << "--";
+		std::cout << "──";
+		if (j != SIZE - 1) std::cout << "┬";
 	}
-	std::cout << "+\n";
+	std::cout << "┐\n";
 
-
+	// ===== 棋盘主体 =====
 	for (int i = 0; i < SIZE; ++i) {
-		// Print row index
-		std::cout << i << " |";
+
+		// 行号 + 左边框
+		std::cout <<" " << i << " │";
+
+		// 格子内容
 		for (int j = 0; j < SIZE; ++j) {
-			char symbol;
-			if (board[i][j] == BLACK) symbol = 'B';
-			else if (board[i][j] == WHITE) symbol = 'W';
-			else if (board[i][j] == BLOCK) symbol = '#';
-			else symbol = '.';
-			std::cout << " " << symbol;
+			std::cout << " " << cell_char(board[i][j]) << "│";
 		}
-		std::cout << " |\n";
+		std::cout << "\n";
+
+		// 行分隔线
+		if (i != SIZE - 1) {
+			std::cout << "   ├";
+			for (int j = 0; j < SIZE; ++j) {
+				std::cout << "──";
+				if (j != SIZE - 1) std::cout << "┼";
+			}
+			std::cout << "┤\n";
+		}
 	}
 
-	// Print bottom separator line
-	std::cout << "  +";
+	// ===== 底边框 =====
+	std::cout << "   └";
 	for (int j = 0; j < SIZE; ++j) {
-		std::cout << "--";
+		std::cout << "──";
+		if (j != SIZE - 1) std::cout << "┴";
 	}
-	std::cout << "+\n";
-
+	std::cout << "┘\n";
 	std::cout << "-------------------------------------------------\n" << std::endl;
 }
 
@@ -647,7 +661,6 @@ bool get_and_apply_player_move(int board[SIZE][SIZE], int player_color) {
 		std::cout << " Error: Block position (rB, cB) cannot be the same as the Queen's destination (r1, c1)." << std::endl;
 		return false;
 	}
-	// *************************************
 
 	// The block position (rB, cB) must be empty on the original board, or the queen's starting spot (which becomes empty).
 	if (board[x2][y2] != EMPTY) {
@@ -714,7 +727,7 @@ int main() {
 
 	clear_screen();
 	std::cout << "------------------------------------------" << std::endl;
-	std::cout << "       AMAZONAS (QUEEN'S GAME) AI        " << std::endl;
+	std::cout << "       AMAZONAS  AI        " << std::endl;
 	std::cout << "------------------------------------------" << std::endl;
 
 	while (true) {
@@ -724,7 +737,7 @@ int main() {
 		else {
 			clear_screen();
 			std::cout << "------------------------------------------" << std::endl;
-			std::cout << "       AMAZONAS (QUEEN'S GAME) AI        " << std::endl;
+			std::cout << "       AMAZONAS  AI        " << std::endl;
 			std::cout << "------------------------------------------" << std::endl;
 		}
 
@@ -897,7 +910,5 @@ int main() {
 		}
 		}
 	}
-	return 0;
-}
 	return 0;
 }
